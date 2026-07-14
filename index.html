@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 피부 무드 — 디저트 처방전</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F0E9DE;
+    --paper-warm:#E4D9C7;
+    --card:#FBF7F1;
+    --ink:#3E2C21;
+    --ink-soft:#6B5546;
+    --ink-faint:#A08D7C;
+    --line:#CBBBA6;
+    --accent:#8A9A7B;      /* 허브 그린 – 비건 결의 유일한 채도 */
+    --shadow:rgba(62,44,33,.08);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  body{
+    font-family:'Noto Sans KR',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.75;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:32px 20px 80px;
+    text-align:center;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .sheet{
+    width:100%;
+    max-width:620px;
+  }
+
+  /* ── 처방전 헤더 ── */
+  .rx-head{
+    border-bottom:1.5px solid var(--ink);
+    padding-bottom:14px;
+    margin-bottom:36px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+  }
+  .rx-mark{
+    font-family:'Gowun Batang',serif;
+    font-size:13px;
+    letter-spacing:.22em;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+  }
+  .rx-date{
+    font-size:11px;
+    letter-spacing:.1em;
+    color:var(--ink-faint);
+    white-space:nowrap;
+  }
+
+  /* ── 인트로 ── */
+  .intro{animation:rise .7s ease both}
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:.28em;
+    color:var(--accent);
+    font-weight:500;
+    margin-bottom:22px;
+  }
+  h1{
+    font-family:'Gowun Batang',serif;
+    font-size:38px;
+    font-weight:700;
+    line-height:1.35;
+    letter-spacing:-.01em;
+    margin-bottom:24px;
+  }
+  h1 em{
+    font-style:normal;
+    display:block;
+    font-size:19px;
+    font-weight:400;
+    color:var(--ink-soft);
+    margin-top:14px;
+    letter-spacing:0;
+  }
+  .intro p{
+    color:var(--ink-soft);
+    font-weight:300;
+    font-size:15.5px;
+    margin-bottom:16px;
+  }
+  .rule{
+    height:1px;
+    background:var(--line);
+    margin:32px 0;
+  }
+  .meta-list{
+    list-style:none;
+    font-size:13.5px;
+    color:var(--ink-faint);
+    display:grid;
+    gap:8px;
+    margin-bottom:38px;
+  }
+  .meta-list li{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+  }
+  .meta-list span{
+    color:var(--accent);
+    font-weight:500;
+  }
+
+  /* ── 버튼 ── */
+  button{
+    font-family:inherit;
+    cursor:pointer;
+    border:none;
+    background:none;
+    color:inherit;
+  }
+  .btn{
+    width:100%;
+    background:var(--ink);
+    color:var(--paper);
+    padding:19px;
+    border-radius:2px;
+    font-size:15px;
+    font-weight:500;
+    letter-spacing:.04em;
+    transition:background .25s ease, transform .15s ease;
+  }
+  .btn:hover{background:#523c2e}
+  .btn:active{transform:translateY(1px)}
+  .btn-ghost{
+    width:100%;
+    border:1px solid var(--line);
+    padding:16px;
+    border-radius:2px;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:12px;
+    transition:border-color .25s, color .25s;
+  }
+  .btn-ghost:hover{border-color:var(--ink);color:var(--ink)}
+  .btn-link{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    width:100%;
+    margin-top:12px;
+    padding:16px;
+    border:1px solid var(--accent);
+    border-radius:2px;
+    background:transparent;
+    color:var(--accent);
+    font-family:inherit;
+    font-size:14px;
+    font-weight:500;
+    letter-spacing:.02em;
+    text-decoration:none;
+    transition:background .25s, color .25s;
+  }
+  .btn-link::after{
+    content:"→";
+    font-size:13px;
+    transition:transform .25s;
+  }
+  .btn-link:hover{
+    background:var(--accent);
+    color:var(--card);
+  }
+  .btn-link:hover::after{transform:translateX(3px)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+  /* ── 진행 ── */
+  .progress-row{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+    margin-bottom:40px;
+  }
+  .track{
+    width:100%;
+    height:2px;
+    background:var(--paper-warm);
+    position:relative;
+  }
+  .fill{
+    position:absolute;top:0;left:0;height:100%;
+    background:var(--ink);
+    width:0;
+    transition:width .45s cubic-bezier(.4,0,.2,1);
+  }
+  .count{
+    font-family:'Gowun Batang',serif;
+    font-size:13px;
+    color:var(--ink-faint);
+    letter-spacing:.08em;
+    white-space:nowrap;
+  }
+
+  /* ── 질문 ── */
+  .q-num{
+    font-family:'Gowun Batang',serif;
+    font-size:12px;
+    letter-spacing:.2em;
+    color:var(--accent);
+    margin-bottom:14px;
+  }
+  .q-text{
+    font-family:'Gowun Batang',serif;
+    font-size:25px;
+    font-weight:700;
+    line-height:1.55;
+    margin-bottom:34px;
+    letter-spacing:-.01em;
+  }
+  .q-note{
+    font-size:13px;
+    color:var(--ink-faint);
+    font-weight:300;
+    margin-top:-22px;
+    margin-bottom:30px;
+  }
+  .choices{display:grid;gap:11px}
+  .choice{
+    text-align:center;
+    background:var(--card);
+    border:1px solid transparent;
+    border-radius:2px;
+    padding:20px 22px;
+    font-size:15px;
+    color:var(--ink);
+    line-height:1.6;
+    box-shadow:0 1px 2px var(--shadow);
+    transition:border-color .2s, transform .12s, background .2s;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    align-items:center;
+  }
+  .choice:hover{border-color:var(--line);transform:translateY(-2px)}
+  .choice:active{background:#F5EFE6}
+  .choice b{
+    font-family:'Gowun Batang',serif;
+    font-weight:400;
+    font-size:12px;
+    letter-spacing:.14em;
+    color:var(--ink-faint);
+  }
+
+  /* ── 결과: 4개 메뉴 ── */
+  .menu{display:grid;gap:12px;margin-bottom:26px}
+  .menu-item{
+    position:relative;
+    background:var(--card);
+    border:1px solid transparent;
+    border-radius:2px;
+    padding:26px 22px 22px;
+    box-shadow:0 1px 2px var(--shadow);
+    transition:border-color .2s, transform .12s, box-shadow .2s;
+    text-align:center;
+    width:100%;
+  }
+  .menu-item:hover:not(:disabled){
+    border-color:var(--line);
+    transform:translateY(-2px);
+    box-shadow:0 4px 12px var(--shadow);
+  }
+  .menu-item.best{
+    border-color:var(--accent);
+    padding-top:34px;
+  }
+  .menu-item.locked{
+    opacity:.45;
+    cursor:not-allowed;
+    background:transparent;
+    border:1px dashed var(--line);
+    box-shadow:none;
+  }
+  .badge{
+    position:absolute;
+    top:-1px;left:50%;
+    transform:translateX(-50%);
+    background:var(--accent);
+    color:var(--card);
+    font-size:10.5px;
+    letter-spacing:.14em;
+    padding:4px 14px;
+    border-radius:0 0 2px 2px;
+  }
+  .menu-type{
+    font-family:'Gowun Batang',serif;
+    font-size:11.5px;
+    letter-spacing:.14em;
+    color:var(--ink-faint);
+    margin-bottom:8px;
+  }
+  .menu-name{
+    font-family:'Gowun Batang',serif;
+    font-size:21px;
+    font-weight:700;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .menu-tag{
+    font-size:13.5px;
+    font-weight:300;
+    color:var(--ink-soft);
+    margin-bottom:18px;
+  }
+  .bar{
+    height:2px;
+    background:var(--paper-warm);
+    margin-bottom:9px;
+  }
+  .bar-fill{
+    height:100%;
+    background:var(--accent);
+    transition:width .8s cubic-bezier(.4,0,.2,1);
+  }
+  .menu-foot{
+    font-size:12px;
+    color:var(--ink-faint);
+    letter-spacing:.03em;
+  }
+
+  /* ── 결과 ── */
+  .r-label{
+    font-size:12px;
+    letter-spacing:.28em;
+    color:var(--accent);
+    font-weight:500;
+    margin-bottom:20px;
+  }
+  .r-type{
+    font-family:'Gowun Batang',serif;
+    font-size:14px;
+    color:var(--ink-soft);
+    letter-spacing:.06em;
+    margin-bottom:10px;
+  }
+  .r-title{
+    font-family:'Gowun Batang',serif;
+    font-size:33px;
+    font-weight:700;
+    line-height:1.4;
+    margin-bottom:22px;
+  }
+  .r-desc{
+    color:var(--ink-soft);
+    font-weight:300;
+    font-size:15.5px;
+    margin-bottom:34px;
+  }
+  .r-card{
+    background:var(--card);
+    border-radius:2px;
+    padding:30px 26px;
+    box-shadow:0 2px 10px var(--shadow);
+    margin-bottom:14px;
+  }
+  .r-card h3{
+    font-family:'Gowun Batang',serif;
+    font-size:12px;
+    letter-spacing:.2em;
+    color:var(--accent);
+    font-weight:400;
+    margin-bottom:16px;
+  }
+  .recipe-name{
+    font-family:'Gowun Batang',serif;
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .recipe-sub{
+    font-size:13.5px;
+    color:var(--ink-faint);
+    margin-bottom:22px;
+    padding-bottom:22px;
+    border-bottom:1px solid var(--paper-warm);
+  }
+  .r-card h4{
+    font-size:11px;
+    letter-spacing:.16em;
+    color:var(--ink-faint);
+    font-weight:500;
+    margin-bottom:12px;
+  }
+  ul.ing{list-style:none;display:grid;gap:7px;margin-bottom:26px}
+  ul.ing li{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    padding-bottom:7px;
+    border-bottom:1px dotted var(--paper-warm);
+  }
+  ul.ing li span{color:var(--ink-faint);font-size:13px;white-space:nowrap}
+  ol.steps{list-style:none;counter-reset:s;display:grid;gap:16px}
+  ol.steps li{
+    counter-increment:s;
+    font-size:14.5px;
+    color:var(--ink-soft);
+    line-height:1.65;
+  }
+  ol.steps li::before{
+    content:counter(s);
+    display:block;
+    font-family:'Gowun Batang',serif;
+    font-size:12px;
+    color:var(--accent);
+    margin-bottom:4px;
+  }
+  .why{
+    background:transparent;
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:26px;
+    margin-bottom:14px;
+  }
+  .why h3{
+    font-family:'Gowun Batang',serif;
+    font-size:12px;
+    letter-spacing:.2em;
+    color:var(--accent);
+    font-weight:400;
+    margin-bottom:14px;
+  }
+  .why p{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    font-weight:300;
+  }
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;justify-content:center}
+  .tag{
+    font-size:12px;
+    color:var(--accent);
+    border:1px solid var(--accent);
+    border-radius:100px;
+    padding:4px 12px;
+    opacity:.85;
+  }
+  .foot{
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-faint);
+    margin-top:44px;
+    letter-spacing:.04em;
+  }
+
+  .view{display:none}
+  .view.on{display:block;animation:rise .55s ease both}
+  @keyframes rise{
+    from{opacity:0;transform:translateY(14px)}
+    to{opacity:1;transform:none}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+  @media(max-width:520px){
+    h1{font-size:30px}
+    .q-text{font-size:21px}
+    .r-title{font-size:27px}
+  }
+</style>
+</head>
+<body>
+<main class="sheet">
+
+  <header class="rx-head">
+    <div class="rx-mark">Skin Mood &nbsp;·&nbsp; Rx</div>
+    <div class="rx-date" id="today"></div>
+  </header>
+
+  <!-- 인트로 -->
+  <section class="view on" id="view-intro">
+    <div class="intro">
+      <p class="eyebrow">비건 · 글루텐프리 디저트 테스트</p>
+      <h1>그래도<br>디저트는 먹고 싶어
+        <em>오늘 내가 먹고 싶은 디저트는 뭘까?<br><br>나만을 위한 디저트 레시피를 추천해드려요.</em>
+      </h1>
+      <div class="rule"></div>
+      <p>유제품·계란·밀가루·정제설탕 없이, 맘 편하게 먹을 수 있는 재료로 만들어요.</p>
+      <ul class="meta-list">
+        <li><span>질문</span>5개 · 약 1분</li>
+        <li><span>결과</span>4가지 디저트 처방</li>
+        <li><span>공통</span>비건 · 글루텐프리 · 저자극</li>
+      </ul>
+      <button class="btn" onclick="start()">진단 시작하기</button>
+    </div>
+  </section>
+
+  <!-- 질문 -->
+  <section class="view" id="view-quiz">
+    <div class="progress-row">
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <div class="count" id="count">01 / 06</div>
+    </div>
+    <p class="q-num" id="qnum">QUESTION 01</p>
+    <h2 class="q-text" id="qtext"></h2>
+    <p class="q-note" id="qnote"></p>
+    <div class="choices" id="choices"></div>
+  </section>
+
+  <!-- 결과: 4개 메뉴 -->
+  <section class="view" id="view-result"></section>
+
+  <!-- 레시피 상세 -->
+  <section class="view" id="view-recipe"></section>
+
+  <p class="foot">© 오늘의 피부 무드 처방전</p>
+</main>
+
+<script>
+/* ─────────────────────────────────────────
+   설계 개요
+
+   [1] 성향 점수 (Q1~Q4)
+   4개 축으로 점수를 모읍니다.
+     cool  = 진정형 : 열감·붉음·예민 → 차갑고 순한 것
+     hydr  = 수분형 : 건조·당김·각질 → 촉촉하고 기름진 것
+     gut   = 장케어형 : 속더부룩·트러블 → 발효·식이섬유
+     energ = 활력형 : 피로·칙칙함·번아웃 → 카카오·견과 밀도
+   각 선택지는 축 하나에 +2, 인접 축에 +1을 줍니다.
+
+   [2] 장비 필터 (Q5)
+   "집에 없는 것"은 성향이 아니라 제약입니다.
+   점수를 주는 게 아니라, 만들 수 없는 레시피를 후보에서 뺍니다.
+     오븐 없음        → 브라우니 제외 (energ)
+     믹서기 없음      → 무스 제외 (hydr)
+     에어프라이어 없음 → 제외 없음 (필수 레시피 없음)
+     전자레인지 없음   → 제외 없음 (필수 레시피 없음)
+   최고점 축이 제외되면 → 남은 축 중 차점으로 내려갑니다.
+   푸딩(cool)과 파르페(gut)는 장비가 필요 없어서 항상 안전망이 됩니다.
+───────────────────────────────────────── */
+
+const QUESTIONS = [
+  {
+    q: "오늘 기분은 어때요?",
+    a: [
+      { t:"예민하고 날이 서 있어요",               s:{cool:2, energ:1} },
+      { t:"괜히 허하고 채워지지 않아요",            s:{hydr:2, cool:1} },
+      { t:"무겁고 답답해요",                      s:{gut:2, energ:1} },
+      { t:"지치고 아무 힘이 없어요",               s:{energ:2, hydr:1} },
+    ]
+  },
+  {
+    q: "오늘 내 컨디션은?",
+    a: [
+      { t:"열이 오르고 얼굴이 붉어요",             s:{cool:2, gut:1} },
+      { t:"당기고 각질이 일어나요",                s:{hydr:2, cool:1} },
+      { t:"속이 더부룩하고 트러블이 올라와요",      s:{gut:2, hydr:1} },
+      { t:"푸석하고 생기가 없어요",                s:{energ:2, gut:1} },
+    ]
+  },
+  {
+    q: "지금 어떤 맛이 당겨요?",
+    a: [
+      { t:"상큼하고 산뜻한 맛",                   s:{cool:2, hydr:1} },
+      { t:"부드럽고 크리미한 맛",                 s:{hydr:2, energ:1} },
+      { t:"새콤하고 가벼운 맛",                   s:{gut:2, cool:1} },
+      { t:"진하고 묵직한 맛",                     s:{energ:2, gut:1} },
+    ]
+  },
+  {
+    q: "부엌에 서 있을 수 있는 시간은?",
+    a: [
+      { t:"5분. 섞어서 냉장고에 넣는 정도",        s:{cool:2, gut:1} },
+      { t:"10분. 재료만 갈면 좋겠어요",           s:{hydr:2, energ:1} },
+      { t:"15분. 잠깐 불은 써도 괜찮아요",         s:{gut:2, hydr:1} },
+      { t:"30분. 오래 걸려도 제대로 만들래요",      s:{energ:2, cool:1} },
+    ]
+  },
+  {
+    q: "우리 집에 없는 건?",
+    note: "없는 걸로 만드는 레시피는 빼드릴게요",
+    a: [
+      { t:"오븐",                  block:["energ"] },
+      { t:"믹서기 (푸드 프로세서)", block:["hydr"]  },
+      { t:"에어프라이어",           block:[]        },
+      { t:"전자레인지",             block:[]        },
+    ]
+  },
+];
+
+const RESULTS = {
+  cool: {
+    type:"진정형 · COOLING",
+    title:"레몬 치아 코코넛 푸딩",
+    tagline:"차갑게 굳혀서 그대로 떠먹는",
+    needs:null,
+    desc:"열감과 붉음이 올라온 날의 처방. 불 쓰지 않고, 차갑게 굳혀서 그대로 떠먹습니다.",
+    sub:"불 없이 · 냉장 2시간 · 2인분",
+    ing:[
+      ["코코넛 밀크","200ml"],
+      ["치아씨드","3큰술"],
+      ["레몬즙","1큰술"],
+      ["메이플시럽","1.5큰술"],
+      ["레몬 제스트","약간"],
+      ["민트잎 (선택)","2~3장"],
+    ],
+    steps:[
+      "볼에 코코넛 밀크와 메이플시럽을 넣고 시럽이 완전히 풀릴 때까지 젓습니다.",
+      "치아씨드를 넣고 30초간 계속 저어 뭉치지 않게 합니다.",
+      "5분 두었다가 한 번 더 저어줍니다. 이 두 번째 젓기가 식감을 가릅니다.",
+      "레몬즙을 넣고 가볍게 섞은 뒤 유리컵에 나눠 담습니다.",
+      "냉장고에서 최소 2시간. 밤새 두면 더 좋습니다.",
+      "먹기 직전 레몬 제스트와 민트를 올립니다.",
+    ],
+    why:"열감이 올라오는 날에는 소화에 에너지를 덜 쓰는 게 낫습니다. 치아씨드는 수분을 머금은 채 부드럽게 넘어가고, 코코넛 밀크는 유제품 없이 부드러움을 만들어요. 레몬의 산미는 무거운 단맛을 씻어내서, 먹고 난 뒤 속이 뜨겁지 않습니다.",
+    tags:["비건","글루텐프리","무가열","오메가3"]
+  },
+  hydr: {
+    type:"수분형 · NOURISHING",
+    title:"아보카도 카카오 무스",
+    tagline:"갈기만 하면 완성되는 크림",
+    needs:"믹서기",
+    desc:"당기고 각질이 이는 날의 처방. 좋은 지방이 안쪽부터 부드럽게 채웁니다.",
+    sub:"불 없이 · 15분 · 2인분",
+    ing:[
+      ["잘 익은 아보카도","1개"],
+      ["카카오파우더","2큰술"],
+      ["메이플시럽","2큰술"],
+      ["아몬드밀크","2~3큰술"],
+      ["바닐라 익스트랙","1/4작은술"],
+      ["소금","한 꼬집"],
+    ],
+    steps:[
+      "아보카도를 반 갈라 씨를 빼고 과육만 믹서에 넣습니다.",
+      "카카오파우더, 메이플시럽, 바닐라, 소금을 함께 넣습니다.",
+      "아몬드밀크를 2큰술만 먼저 넣고 갑니다. 되직하면 그때 1큰술 더.",
+      "완전히 매끈해질 때까지 갈아주세요. 알갱이가 남으면 아보카도 맛이 납니다.",
+      "볼에 담아 냉장고에서 30분 차갑게 둡니다.",
+      "코코넛 슬라이스나 딸기를 올려 마무리합니다.",
+    ],
+    why:"피부가 당길 때는 물보다 지방이 필요할 때가 많습니다. 아보카도의 불포화지방은 생으로 먹을 때 가장 온전하고, 여기서는 크림 대신 질감까지 만들어줘요. 카카오와 소금 한 꼬집이 아보카도의 풀향을 완전히 덮어서, 정말 초콜릿 무스 맛이 납니다.",
+    tags:["비건","글루텐프리","무가열","불포화지방"]
+  },
+  gut: {
+    type:"장케어형 · CLEANSING",
+    title:"코코넛 요거트 베리 파르페",
+    tagline:"층층이 쌓아 올리는 발효 한 컵",
+    needs:null,
+    desc:"속이 무겁고 트러블이 올라오는 날의 처방. 발효와 섬유질을 층층이 쌓습니다.",
+    sub:"직접 발효 시 하루 · 시판 사용 시 10분 · 2인분",
+    ing:[
+      ["코코넛 요거트 (무가당)","300g"],
+      ["냉동 믹스베리","150g"],
+      ["글루텐프리 오트","4큰술"],
+      ["호박씨","2큰술"],
+      ["메이플시럽","1큰술"],
+      ["레몬즙","1작은술"],
+    ],
+    steps:[
+      "냄비에 베리와 레몬즙을 넣고 약불에서 5분, 살짝 뭉개질 때까지 졸입니다.",
+      "메이플시럽을 넣고 1분 더 끓인 뒤 완전히 식힙니다. 뜨거운 채로 얹으면 유산균이 죽습니다.",
+      "오트와 호박씨는 마른 팬에 3분간 볶아 고소한 향을 냅니다.",
+      "유리컵에 요거트 → 베리 → 오트 순으로 두 번 반복해 쌓습니다.",
+      "맨 위에 호박씨를 뿌리고 바로 냅니다.",
+    ],
+    why:"턱 주변 트러블은 장 컨디션과 자주 같이 움직입니다. 코코넛 요거트는 유제품 없이 유산균을 주고, 글루텐프리 오트가 그 균이 먹을 섬유질이 되어줘요. 베리를 식혀서 얹는 이유도 여기 있습니다 — 뜨거우면 살려둔 균이 사라집니다.",
+    tags:["비건","글루텐프리","프로바이오틱","식이섬유"]
+  },
+  energ: {
+    type:"활력형 · GROUNDING",
+    title:"고구마 카카오 브라우니",
+    tagline:"밀가루 없이 촉촉하게 굽는",
+    needs:"오븐",
+    desc:"칙칙하고 지친 날의 처방. 밀가루 없이도 촉촉하게, 오븐에서 30분.",
+    sub:"오븐 180℃ · 30분 · 4인분",
+    ing:[
+      ["삶은 고구마","200g"],
+      ["아몬드가루","80g"],
+      ["카카오파우더","30g"],
+      ["코코넛오일 (녹인 것)","3큰술"],
+      ["메이플시럽","4큰술"],
+      ["베이킹소다","1/2작은술"],
+      ["소금","한 꼬집"],
+      ["다진 호두","30g"],
+    ],
+    steps:[
+      "오븐을 180℃로 예열합니다.",
+      "따뜻한 고구마를 포크로 완전히 으깨 덩어리를 없앱니다.",
+      "코코넛오일과 메이플시럽을 넣고 매끈해질 때까지 섞습니다.",
+      "아몬드가루, 카카오, 베이킹소다, 소금을 체 쳐 넣고 가볍게 자르듯 섞습니다.",
+      "호두를 넣고 반죽을 틀에 평평하게 눌러 담습니다.",
+      "180℃에서 28~30분. 가운데를 찔러 촉촉한 부스러기가 묻어나면 완성.",
+      "완전히 식힌 뒤 자릅니다. 뜨거울 때 자르면 무너집니다.",
+    ],
+    why:"피로한 날 단 게 당기는 건 몸이 보내는 신호에 가깝습니다. 문제는 정제설탕이 그 신호를 더 크게 만든다는 것. 고구마의 천천한 당과 아몬드가루의 단백질이 그 곡선을 완만하게 눌러줍니다. 밀가루를 뺐는데도 촉촉한 이유는 고구마가 수분을 잡고 있기 때문이에요.",
+    tags:["비건","글루텐프리","저GI","오븐"]
+  },
+};
+
+const ORDER = ["cool","hydr","gut","energ"];
+let idx = 0;
+let score = { cool:0, hydr:0, gut:0, energ:0 };
+let blocked = [];
+
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2,"0");
+
+const d = new Date();
+$("today").textContent =
+  `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())}`;
+
+function show(v){
+  document.querySelectorAll(".view").forEach(e=>e.classList.remove("on"));
+  $("view-"+v).classList.add("on");
+  window.scrollTo({top:0, behavior:"instant"});
+}
+
+function start(){
+  idx = 0;
+  score = { cool:0, hydr:0, gut:0, energ:0 };
+  blocked = [];
+  show("quiz");
+  render();
+}
+
+function render(){
+  const q = QUESTIONS[idx];
+  const total = QUESTIONS.length;
+
+  $("fill").style.width = ((idx)/total*100) + "%";
+  $("count").textContent = `${pad(idx+1)} / ${pad(total)}`;
+  $("qnum").textContent = `QUESTION ${pad(idx+1)}`;
+  $("qtext").textContent = q.q;
+
+  $("qnote").textContent = q.note || "";
+  $("qnote").style.display = q.note ? "block" : "none";
+
+  const box = $("choices");
+  box.innerHTML = "";
+  const marks = ["A","B","C","D"];
+
+  q.a.forEach((opt,i)=>{
+    const b = document.createElement("button");
+    b.className = "choice";
+    b.innerHTML = `<b>${marks[i]}</b><span>${opt.t}</span>`;
+    b.onclick = ()=>pick(opt);
+    box.appendChild(b);
+  });
+}
+
+function pick(opt){
+  if (opt.s){
+    for (const k in opt.s) score[k] += opt.s[k];
+  }
+  if (opt.block){
+    blocked = blocked.concat(opt.block);
+  }
+  idx++;
+  if (idx < QUESTIONS.length) render();
+  else finish();
+}
+
+function finish(){
+  // 장비가 없어 만들 수 없는 축을 표시합니다 (숨기지 않고 잠급니다).
+  let pool = ORDER.filter(k => !blocked.includes(k));
+  if (pool.length === 0) pool = ORDER.slice();
+
+  // 점수순 정렬. 동점이면 ORDER 순.
+  const ranked = ORDER.slice().sort((a,b)=>{
+    const av = blocked.includes(a) ? -1 : 0;
+    const bv = blocked.includes(b) ? -1 : 0;
+    if (av !== bv) return bv - av;                 // 잠긴 건 뒤로
+    if (score[b] !== score[a]) return score[b] - score[a];
+    return ORDER.indexOf(a) - ORDER.indexOf(b);
+  });
+
+  const best = ranked[0];
+  const max = Math.max(...ORDER.map(k=>score[k])) || 1;
+
+  const cards = ranked.map((k,i)=>{
+    const r = RESULTS[k];
+    const locked = blocked.includes(k);
+    const pct = Math.round(score[k] / max * 100);
+
+    return `
+      <button class="menu-item${locked ? " locked" : ""}${i===0 && !locked ? " best" : ""}"
+              ${locked ? "disabled" : `onclick="openRecipe('${k}')"`}>
+        ${i===0 && !locked ? `<span class="badge">오늘의 추천</span>` : ``}
+        <p class="menu-type">${r.type}</p>
+        <p class="menu-name">${r.title}</p>
+        <p class="menu-tag">${r.tagline}</p>
+        <div class="bar"><div class="bar-fill" style="width:${locked ? 0 : pct}%"></div></div>
+        <p class="menu-foot">${
+          locked
+            ? `${r.needs}가 없어서 오늘은 어려워요`
+            : `잘 맞아요 ${pct}%`
+        }</p>
+      </button>`;
+  }).join("");
+
+  $("view-result").innerHTML = `
+    <p class="r-label">오늘의 처방</p>
+    <h2 class="r-title">이 중에서 골라보세요</h2>
+    <p class="r-desc">답변을 바탕으로 잘 맞는 순서대로 정리했어요.<br>궁금한 걸 눌러보면 레시피가 나와요.</p>
+    <div class="menu">${cards}</div>
+    <button class="btn-ghost" onclick="start()">다시 진단하기</button>
+    <a class="btn-link" href="https://smartstore.naver.com/maybakery" target="_blank" rel="noopener noreferrer">다른 디저트 사러가보기</a>
+  `;
+  show("result");
+}
+
+function openRecipe(key){
+  const r = RESULTS[key];
+
+  $("view-recipe").innerHTML = `
+    <p class="r-type">${r.type}</p>
+    <h2 class="r-title">${r.title}</h2>
+    <p class="r-desc">${r.desc}</p>
+
+    <div class="r-card">
+      <h3>RECIPE</h3>
+      <p class="recipe-name">${r.title}</p>
+      <p class="recipe-sub">${r.sub}</p>
+
+      <h4>재료</h4>
+      <ul class="ing">
+        ${r.ing.map(([n,q])=>`<li>${n}<span>${q}</span></li>`).join("")}
+      </ul>
+
+      <h4>만드는 법</h4>
+      <ol class="steps">
+        ${r.steps.map(s=>`<li>${s}</li>`).join("")}
+      </ol>
+    </div>
+
+    <div class="why">
+      <h3>왜 이 디저트인가</h3>
+      <p>${r.why}</p>
+      <div class="tags">
+        ${r.tags.map(t=>`<span class="tag">${t}</span>`).join("")}
+      </div>
+    </div>
+
+    <button class="btn" onclick="show('result')">다른 디저트 보기</button>
+    <button class="btn-ghost" onclick="start()">다시 진단하기</button>
+    <a class="btn-link" href="https://smartstore.naver.com/maybakery" target="_blank" rel="noopener noreferrer">다른 디저트 사러가보기</a>
+  `;
+  show("recipe");
+}
+</script>
+</body>
+</html>
