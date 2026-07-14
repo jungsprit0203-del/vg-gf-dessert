@@ -231,6 +231,82 @@
     color:var(--ink-faint);
   }
 
+  /* ── 결과: 4개 메뉴 ── */
+  .menu{display:grid;gap:12px;margin-bottom:26px}
+  .menu-item{
+    position:relative;
+    background:var(--card);
+    border:1px solid transparent;
+    border-radius:2px;
+    padding:26px 22px 22px;
+    box-shadow:0 1px 2px var(--shadow);
+    transition:border-color .2s, transform .12s, box-shadow .2s;
+    text-align:center;
+    width:100%;
+  }
+  .menu-item:hover:not(:disabled){
+    border-color:var(--line);
+    transform:translateY(-2px);
+    box-shadow:0 4px 12px var(--shadow);
+  }
+  .menu-item.best{
+    border-color:var(--accent);
+    padding-top:34px;
+  }
+  .menu-item.locked{
+    opacity:.45;
+    cursor:not-allowed;
+    background:transparent;
+    border:1px dashed var(--line);
+    box-shadow:none;
+  }
+  .badge{
+    position:absolute;
+    top:-1px;left:50%;
+    transform:translateX(-50%);
+    background:var(--accent);
+    color:var(--card);
+    font-size:10.5px;
+    letter-spacing:.14em;
+    padding:4px 14px;
+    border-radius:0 0 2px 2px;
+  }
+  .menu-type{
+    font-family:'Gowun Batang',serif;
+    font-size:11.5px;
+    letter-spacing:.14em;
+    color:var(--ink-faint);
+    margin-bottom:8px;
+  }
+  .menu-name{
+    font-family:'Gowun Batang',serif;
+    font-size:21px;
+    font-weight:700;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .menu-tag{
+    font-size:13.5px;
+    font-weight:300;
+    color:var(--ink-soft);
+    margin-bottom:18px;
+  }
+  .bar{
+    height:2px;
+    background:var(--paper-warm);
+    margin-bottom:9px;
+  }
+  .bar-fill{
+    height:100%;
+    background:var(--accent);
+    transition:width .8s cubic-bezier(.4,0,.2,1);
+  }
+  .menu-foot{
+    font-size:12px;
+    color:var(--ink-faint);
+    letter-spacing:.03em;
+  }
+
   /* ── 결과 ── */
   .r-label{
     font-size:12px;
@@ -411,8 +487,11 @@
     <div class="choices" id="choices"></div>
   </section>
 
-  <!-- 결과 -->
+  <!-- 결과: 4개 메뉴 -->
   <section class="view" id="view-result"></section>
+
+  <!-- 레시피 상세 -->
+  <section class="view" id="view-recipe"></section>
 
   <p class="foot">© 오늘의 피부 무드 처방전</p>
 </main>
@@ -493,6 +572,8 @@ const RESULTS = {
   cool: {
     type:"진정형 · COOLING",
     title:"레몬 치아 코코넛 푸딩",
+    tagline:"차갑게 굳혀서 그대로 떠먹는",
+    needs:null,
     desc:"열감과 붉음이 올라온 날의 처방. 불 쓰지 않고, 차갑게 굳혀서 그대로 떠먹습니다.",
     sub:"불 없이 · 냉장 2시간 · 2인분",
     ing:[
@@ -517,6 +598,8 @@ const RESULTS = {
   hydr: {
     type:"수분형 · NOURISHING",
     title:"아보카도 카카오 무스",
+    tagline:"갈기만 하면 완성되는 크림",
+    needs:"믹서기",
     desc:"당기고 각질이 이는 날의 처방. 좋은 지방이 안쪽부터 부드럽게 채웁니다.",
     sub:"불 없이 · 15분 · 2인분",
     ing:[
@@ -541,6 +624,8 @@ const RESULTS = {
   gut: {
     type:"장케어형 · CLEANSING",
     title:"코코넛 요거트 베리 파르페",
+    tagline:"층층이 쌓아 올리는 발효 한 컵",
+    needs:null,
     desc:"속이 무겁고 트러블이 올라오는 날의 처방. 발효와 섬유질을 층층이 쌓습니다.",
     sub:"직접 발효 시 하루 · 시판 사용 시 10분 · 2인분",
     ing:[
@@ -564,6 +649,8 @@ const RESULTS = {
   energ: {
     type:"활력형 · GROUNDING",
     title:"고구마 카카오 브라우니",
+    tagline:"밀가루 없이 촉촉하게 굽는",
+    needs:"오븐",
     desc:"칙칙하고 지친 날의 처방. 밀가루 없이도 촉촉하게, 오븐에서 30분.",
     sub:"오븐 180℃ · 30분 · 4인분",
     ing:[
@@ -654,19 +741,57 @@ function pick(opt){
 }
 
 function finish(){
-  // 장비가 없어 만들 수 없는 축을 후보에서 뺍니다.
+  // 장비가 없어 만들 수 없는 축을 표시합니다 (숨기지 않고 잠급니다).
   let pool = ORDER.filter(k => !blocked.includes(k));
-  if (pool.length === 0) pool = ORDER;   // 안전장치
+  if (pool.length === 0) pool = ORDER.slice();
 
-  // 남은 후보 중 최고점. 동점이면 ORDER 순으로 앞선 축.
-  let win = pool[0];
-  for (const k of pool){
-    if (score[k] > score[win]) win = k;
-  }
-  const r = RESULTS[win];
+  // 점수순 정렬. 동점이면 ORDER 순.
+  const ranked = ORDER.slice().sort((a,b)=>{
+    const av = blocked.includes(a) ? -1 : 0;
+    const bv = blocked.includes(b) ? -1 : 0;
+    if (av !== bv) return bv - av;                 // 잠긴 건 뒤로
+    if (score[b] !== score[a]) return score[b] - score[a];
+    return ORDER.indexOf(a) - ORDER.indexOf(b);
+  });
+
+  const best = ranked[0];
+  const max = Math.max(...ORDER.map(k=>score[k])) || 1;
+
+  const cards = ranked.map((k,i)=>{
+    const r = RESULTS[k];
+    const locked = blocked.includes(k);
+    const pct = Math.round(score[k] / max * 100);
+
+    return `
+      <button class="menu-item${locked ? " locked" : ""}${i===0 && !locked ? " best" : ""}"
+              ${locked ? "disabled" : `onclick="openRecipe('${k}')"`}>
+        ${i===0 && !locked ? `<span class="badge">오늘의 추천</span>` : ``}
+        <p class="menu-type">${r.type}</p>
+        <p class="menu-name">${r.title}</p>
+        <p class="menu-tag">${r.tagline}</p>
+        <div class="bar"><div class="bar-fill" style="width:${locked ? 0 : pct}%"></div></div>
+        <p class="menu-foot">${
+          locked
+            ? `${r.needs}가 없어서 오늘은 어려워요`
+            : `잘 맞아요 ${pct}%`
+        }</p>
+      </button>`;
+  }).join("");
 
   $("view-result").innerHTML = `
     <p class="r-label">오늘의 처방</p>
+    <h2 class="r-title">이 중에서 골라보세요</h2>
+    <p class="r-desc">답변을 바탕으로 잘 맞는 순서대로 정리했어요.<br>궁금한 걸 눌러보면 레시피가 나와요.</p>
+    <div class="menu">${cards}</div>
+    <button class="btn-ghost" onclick="start()">다시 진단하기</button>
+  `;
+  show("result");
+}
+
+function openRecipe(key){
+  const r = RESULTS[key];
+
+  $("view-recipe").innerHTML = `
     <p class="r-type">${r.type}</p>
     <h2 class="r-title">${r.title}</h2>
     <p class="r-desc">${r.desc}</p>
@@ -695,9 +820,10 @@ function finish(){
       </div>
     </div>
 
+    <button class="btn" onclick="show('result')">다른 디저트 보기</button>
     <button class="btn-ghost" onclick="start()">다시 진단하기</button>
   `;
-  show("result");
+  show("recipe");
 }
 </script>
 </body>
